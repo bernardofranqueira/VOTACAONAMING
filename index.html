@@ -386,7 +386,96 @@
                <div class="key-points">
                    <h4>Pontos-chave:</h4>
                    <ul>
-                       <li>Som tecnológico</li>
-                       <li>Significa conexão/origem</li>
-                       <li>Moderno e distintivo</li>
-                       <li>Internacional
+<script>
+    let selectedButton = null;
+    let votes = JSON.parse(localStorage.getItem('namingVotes')) || {
+        'ADEAN': 0, 'AEVA': 0, 'LYRA': 0, 'LUMEX': 0,
+        'AEON': 0, 'ALBA': 0, 'NOVA': 0, 'SEMA': 0,
+        'PRIMA': 0, 'NEXUS': 0, 'GERMEN': 0, 'ORIGO': 0
+    };
+
+    function saveVotes() {
+        localStorage.setItem('namingVotes', JSON.stringify(votes));
+    }
+
+    function toggleSelection(name, button) {
+        // Se está clicando na mesma opção
+        if (selectedButton === button) {
+            votes[name]--;
+            button.classList.remove('selected');
+            button.textContent = `Selecionar (${votes[name]} votos)`;
+            selectedButton = null;
+            hideNotification();
+        } else {
+            // Se está mudando de opção
+            if (selectedButton) {
+                const prevName = selectedButton.dataset.name;
+                votes[prevName]--;
+                selectedButton.classList.remove('selected');
+                selectedButton.textContent = `Selecionar (${votes[prevName]} votos)`;
+            }
+            
+            // Seleciona nova opção
+            votes[name]++;
+            button.classList.add('selected');
+            button.textContent = `Selecionado (${votes[name]} votos)`;
+            selectedButton = button;
+            showNotification(name);
+        }
+
+        saveVotes();
+        updateAllVoteCounts();
+    }
+
+    function updateAllVoteCounts() {
+        const buttons = document.querySelectorAll('.button');
+        buttons.forEach(button => {
+            const name = button.dataset.name;
+            if (button !== selectedButton) {
+                button.textContent = `Selecionar (${votes[name]} votos)`;
+            }
+        });
+        updateTotalVotes();
+    }
+
+    function getTotalVotes() {
+        return Object.values(votes).reduce((a, b) => a + b, 0);
+    }
+
+    function updateTotalVotes() {
+        const totalVotesElement = document.getElementById('total-votes');
+        totalVotesElement.textContent = `Total de votos: ${getTotalVotes()}`;
+    }
+
+    function showNotification(name) {
+        const notification = document.getElementById('notification');
+        notification.textContent = `Você selecionou: ${name} (${votes[name]} votos)`;
+        notification.style.display = 'block';
+    }
+
+    function hideNotification() {
+        const notification = document.getElementById('notification');
+        notification.style.display = 'none';
+    }
+
+    // Inicializa os contadores ao carregar a página
+    document.addEventListener('DOMContentLoaded', function() {
+        updateAllVoteCounts();
+
+        // Recupera seleção anterior
+        const buttons = document.querySelectorAll('.button');
+        buttons.forEach(button => {
+            const name = button.dataset.name;
+            if (votes[name] > 0) {
+                selectedButton = button;
+                button.classList.add('selected');
+                button.textContent = `Selecionado (${votes[name]} votos)`;
+                showNotification(name);
+            }
+        });
+    });
+</script>
+
+<div id="notification" class="notification"></div>
+</body>
+</html>
