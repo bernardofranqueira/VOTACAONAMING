@@ -4,109 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NAMING</title>
-    <script src="https://cdn.jsdelivr.net/npm/firebase@9.22.1/firebase-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/firebase@9.22.1/firebase-database.js"></script>
     <style>
-        /* [Todo o CSS anterior permanece igual] */
+        /* Todo o CSS anterior permanece igual */
     </style>
 </head>
 <body>
-    <!-- [Todo o HTML anterior permanece igual] -->
+    <!-- Todo o HTML anterior permanece igual -->
     <script>
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "sua_api_key",
-            authDomain: "seu_auth_domain",
-            databaseURL: "seu_database_url",
-            projectId: "seu_project_id",
-            storageBucket: "seu_storage_bucket",
-            messagingSenderId: "seu_messaging_sender_id",
-            appId: "seu_app_id"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        let selectedButton = null;
-        let votes = {};
-
-        // Load votes from Firebase
-        database.ref('votes').on('value', (snapshot) => {
-            votes = snapshot.val() || {
-                'ADEAN': 0, 'AEVA': 0, 'LYRA': 0, 'LUMEX': 0,
-                'AEON': 0, 'ALBA': 0, 'NOVA': 0, 'SEMA': 0,
-                'PRIMA': 0, 'NEXUS': 0, 'GERMEN': 0, 'ORIGO': 0
-            };
-            updateAllVoteCounts();
-            updateTotalVotes();
-        });
-
-        function saveVotes() {
-            database.ref('votes').set(votes);
-        }
-
-        function getTotalVotes() {
-            return Object.values(votes).reduce((a, b) => a + b, 0);
-        }
-
-        function updateTotalVotes() {
-            const totalVotesElement = document.getElementById('total-votes');
-            totalVotesElement.textContent = `Total de votos: ${getTotalVotes()}`;
-        }
-
-        function toggleSelection(name, button) {
-            if (selectedButton) {
-                selectedButton.classList.remove('selected');
-                selectedButton.textContent = `Selecionar (${votes[selectedButton.dataset.name]} votos)`;
-            }
-            
-            if (selectedButton !== button) {
-                votes[name]++;
-                button.classList.add('selected');
-                button.textContent = `Selecionado (${votes[name]} votos)`;
-                selectedButton = button;
-                showNotification(name);
-            } else {
-                votes[name]--;
-                selectedButton = null;
-                button.textContent = `Selecionar (${votes[name]} votos)`;
-                hideNotification();
-            }
-
-            saveVotes();
-            updateTotalVotes();
-            updateAllVoteCounts();
-        }
-
-        function updateAllVoteCounts() {
-            const buttons = document.querySelectorAll('.button');
-            buttons.forEach(button => {
-                const name = button.dataset.name;
-                if (button !== selectedButton) {
-                    button.textContent = `Selecionar (${votes[name]} votos)`;
-                }
-            });
-        }
-
-        function showNotification(name) {
-            const notification = document.getElementById('notification');
-            notification.textContent = `Você selecionou: ${name} (${votes[name]} votos)`;
-            notification.style.display = 'block';
-        }
-
-        function hideNotification() {
-            const notification = document.getElementById('notification');
-            notification.style.display = 'none';
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const buttons = document.querySelectorAll('.button');
-            buttons.forEach(button => {
-                const name = button.dataset.name;
-                button.textContent = `Selecionar (${votes[name]} votos)`;
-            });
-            updateTotalVotes();
-        });
-    </script>
-</body>
-</html>
+        // Função para buscar votos na API do GitHub
+        async function getVotes() {
+            try {
+                const response = await fetch('https://api.github.com/repos/bernardofranqueira/VOTACAONAMING/issues/1');
+                const issue = await response.json();
+                return JSON.parse(issue.body);
+            } catch {
+                return {
+                    'ADEAN': 0, '
